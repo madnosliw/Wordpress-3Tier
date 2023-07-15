@@ -222,6 +222,8 @@ Resources:
         LaunchTemplateId: !Ref LaunchTemplate
         Version: !GetAtt LaunchTemplate.LatestVersionNumber
       NewInstancesProtectedFromScaleIn: false
+      MetricsCollection:
+        - Granularity: 1Minute
       TargetGroupARNs:
         - !Ref ALBTargetGroup
       VPCZoneIdentifier:
@@ -413,9 +415,9 @@ Resources:
       Protocol: HTTP
       ProtocolVersion: HTTP1
       TargetType: instance
-      HealthCheckIntervalSeconds: 30
+      HealthCheckIntervalSeconds: 60
       HealthCheckPath: /
-      HealthCheckTimeoutSeconds: 15
+      HealthCheckTimeoutSeconds: 45
       HealthyThresholdCount: 5
       UnhealthyThresholdCount: 3
       VpcId: 
