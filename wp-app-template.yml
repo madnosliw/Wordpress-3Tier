@@ -282,7 +282,7 @@ Resources:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
       AlarmDescription: 'Scale in when CPU utilization < 60% for 2 minutes'
-      ComparisonOperator: GreaterThanThreshold
+      ComparisonOperator: LessThanThreshold
       EvaluationPeriods: 2
       Period: 60
       Statistic: Average
