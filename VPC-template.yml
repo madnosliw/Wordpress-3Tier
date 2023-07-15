@@ -1,0 +1,275 @@
+Description: 3 Tier VPC infrastructure configuration
+Resources:
+# VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.16.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: WP-VPC
+  IPv6CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref VPC
+
+# Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: WP-IGW
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+# Subnets
+  SNDbA:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.16.0.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '01::/64'
+      Tags:
+        - Key: Name
+          Value: sn-db-A
+  SNAppA:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.16.16.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '02::/64'
+      Tags:
+        - Key: Name
+          Value: sn-app-A
+  SNWebA:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.16.32.0/20
+      AssignIpv6AddressOnCreation: true
+      MapPublicIpOnLaunch: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '03::/64'
+      Tags:
+        - Key: Name
+          Value: sn-web-A
+# Note: The following addresses are reserved for future use:
+# 10.16.48.0/20
+# 04::/64
+
+  SNDbB:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: 10.16.64.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '05::/64'
+      Tags:
+        - Key: Name
+          Value: sn-db-B
+  SNAppB:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: 10.16.80.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '06::/64'
+      Tags:
+        - Key: Name
+          Value: sn-app-B
+  SNWebB:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: 10.16.96.0/20
+      AssignIpv6AddressOnCreation: true
+      MapPublicIpOnLaunch: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '07::/64'
+      Tags:
+        - Key: Name
+          Value: sn-web-B
+# Note: The following addresses are reserved for future use:
+# 10.16.112.0/20
+# 08::/64
+
+  SNDbC:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: 10.16.128.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '09::/64'
+      Tags:
+        - Key: Name
+          Value: sn-db-C
+  SNAppC:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: 10.16.144.0/20
+      AssignIpv6AddressOnCreation: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '0A::/64'
+      Tags:
+        - Key: Name
+          Value: sn-app-C
+  SNWebC:
+    Type: AWS::EC2::Subnet
+    DependsOn: IPv6CidrBlock
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: 10.16.160.0/20
+      AssignIpv6AddressOnCreation: true
+      MapPublicIpOnLaunch: true
+      Ipv6CidrBlock: !Sub
+        - '${Prefix}${Subnet}'
+        - Prefix: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+          Subnet: '0B::/64'
+      Tags:
+        - Key: Name
+          Value: sn-web-C
+# Note: The following addresses are reserved for future use:
+# 10.16.176.0/20
+# 0C::/64
+
+# Route Tables
+  RTPublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: WP-vpc-rt-pub
+  RTPublicIPv4:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RTPublic
+  RTPublicIPv6:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment
+    Properties:
+      DestinationIpv6CidrBlock: ::/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RTPublic
+  RTAssociationWebA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RTPublic
+      SubnetId: !Ref SNWebA
+  RTAssociationWebB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RTPublic
+      SubnetId: !Ref SNWebB
+  RTAssociationWebC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RTPublic
+      SubnetId: !Ref SNWebC
+
+Outputs:
+  VPCId:
+    Value: !Ref VPC
+    Description: VPC ID
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'
+# DB Tier subnets
+  SubnetDbAId:
+    Value: !Ref SNDbA
+    Description: Private DB Subnet ID in AZ A
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetDbA'
+  SubnetDbBId:
+    Value: !Ref SNDbB
+    Description: Private DB Subnet ID in AZ B
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetDbB'
+  SubnetDbCId:
+    Value: !Ref SNDbC
+    Description: Private DB Subnet ID in AZ C
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetDbC'
+# App Tier subnets
+  SubnetAppAId:
+    Value: !Ref SNAppA
+    Description: Private App Subnet ID in AZ A
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetAppA'
+  SubnetAppBId:
+    Value: !Ref SNAppB
+    Description: Private App Subnet ID in AZ B
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetAppB'
+  SubnetAppCId:
+    Value: !Ref SNAppC
+    Description: Private App Subnet ID in AZ C
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetAppC'
+# Public Web Tier subnets    
+  SubnetWebAId:
+    Value: !Ref SNWebA
+    Description: Public Subnet ID in AZ A
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetWebA'
+  SubnetWebBId:
+    Value: !Ref SNWebB
+    Description: Public Subnet ID in AZ B
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetWebB'
+  SubnetWebCId:
+    Value: !Ref SNWebC
+    Description: Public Subnet ID in AZ C
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetWebC'
